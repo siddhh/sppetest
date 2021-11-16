@@ -1,0 +1,87 @@
+{% extends 'base.pleine.html.twig' %}
+
+{% block title %}Gestion | {% if user is defined %}Mise à jour de l'utilisateur {{ user.prenom }} {{ user.nom }}{% else %}Création d'un utilisateur{% endif %} | {{ parent() }}{% endblock %}
+
+{% block contenu %}
+
+    <h2 class="page-title">{% if user is defined %}Mise à jour de l'utilisateur {{ user.prenom }} {{ user.nom }}{% else %}Création d'un utilisateur{% endif %}</h2>
+
+    <div class="form">
+
+    {% set formAction = user is defined ? 'update' : 'create' %}
+    {{ form_start(form, { 'attr': { 'data-action': formAction }}) }}
+
+    <div class="form-group">
+        {{ form_label(form.prenom, 'Prénom*', {'label_attr': {'class': 'col-form-label ' ~ (form.prenom.vars.valid ? '' : 'form-label-error') }}) }}
+        <div>
+            {{ form_widget(form.prenom, {'attr': {'class': 'form-control ' ~ (form.prenom.vars.valid ? '' : 'form-control-error') }}) }}
+            <div class="form-errors">
+                {{ form_errors(form.prenom) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.nom, 'Nom*', {'label_attr': {'class': 'col-form-label ' ~ (form.nom.vars.valid ? '' : 'form-label-error') }}) }}
+        <div>
+            {{ form_widget(form.nom, {'attr': {'class': 'form-control ' ~ (form.nom.vars.valid ? '' : 'form-control-error') }}) }}
+            <div class="form-errors">
+                {{ form_errors(form.nom) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.motdepasseDisplayed, 'Mot de passe', {'label_attr': {'class': 'col-form-label ' ~ (form.motdepasseDisplayed.vars.valid ? '' : 'form-label-error') }}) }}
+        <div>
+            <div class="row">
+                <div class="col-7">
+                    {{ form_widget(form.motdepasseDisplayed, {'attr': {'class': 'form-control ' ~ (form.motdepasseDisplayed.vars.valid ? '' : 'form-control-error'), 'autocomplete': 'off' }}) }}
+                </div>
+                <div class="col-5">
+                    {{ form_widget(form.motdepasseUpdate) }} <label for="user_motdepasseUpdate">{% if user is defined %}Changer le mot de passe{% else %}Définir un mot de passe{% endif %}</label>
+                </div>
+            </div>
+            <div class="form-errors motdepasse-status">
+                {{ form_errors(form.motdepasseDisplayed) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.balp, 'Balp*', {'label_attr': {'class': 'col-form-label ' ~ (form.balp.vars.valid ? '' : 'form-label-error') }}) }}
+        <div>
+            {{ form_widget(form.balp, {'attr': {'class': 'form-control ' ~ (form.balp.vars.valid ? '' : 'form-control-error') }}) }}
+            <div class="form-errors">
+                {{ form_errors(form.balp) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.services, 'Services*', {'label_attr': {'class': 'col-form-label ' ~ (form.services.vars.valid ? '' : 'form-label-error') }}) }}
+        <div>
+            {{ form_widget(form.services, {'attr': {'class': 'form-control selectpicker ' ~ (form.services.vars.valid ? '' : 'form-control-error') }}) }}
+            <div class="form-errors">
+                {{ form_errors(form.services) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="barre-boutons-bas">
+        <a href="javascript:history.back();" class="btn btn-secondary">Annuler</a>
+        {% if user is defined %}{{ form_widget(form.actionRemove, {'attr': {'class': 'btn btn-danger' }, 'label': 'Supprimer l\'utilisateur'}) }}{% endif %}
+        {{ form_widget(form.actionSave, {'attr': {'class': 'btn btn-primary' }, 'label': 'Enregistrer l\'utilisateur'}) }}
+    </div>
+
+    {{ form_widget(form._token) }}
+
+    {{ form_end(form, {'render_rest': false}) }}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('assets/js/utils/pagination.js') }}" type="text/javascript"></script>
+    <script src="{{ asset('assets/js/gestion/utilisateurs/edition.js') }}" type="text/javascript"></script>
+{% endblock %}

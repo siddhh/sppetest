@@ -1,0 +1,143 @@
+{% extends 'gestion/base.pleine.html.twig' %}
+
+{% block title %}Gestion des Domaines | {{ parent() }}{% endblock %}
+
+{% block contenu %}
+    <div id="liste-domaines">
+        <h2 class="page-title">Gestion du référentiel domaine</h2>
+        <div class="row mt-3">
+            <div class="col text-right">
+                <button class="btn btn-primary" type="button" id="btn-creation-domaine">Créer un domaine</button>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                <table class="table table-striped" id="table-domaines">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th scope="col" class="text-center">Valeur</th>
+                            <th scope="col" class="col-1"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reference in referenceList %}
+                            <tr data-id="{{ reference.id }}" {{ reference.domaineParent is null ? '' : 'data-parent=' ~ reference.domaineParent.id }}>
+                                <td class="text-center {{ reference.domaineParent is null ? '">' : 'text-info"><small>' }}{{ reference.label }}{{ reference.domaineParent is null ? '' : '</small>' }}</td>
+                                <td class="text-right">
+                                    <div class="btn-group">
+                                        {% if reference.domaineParent is null %}
+                                            <button class="btn btn-sm btn-info btn-add" title="Ajouter un sous-domaine"><i class="fa fa-plus"></i></button>
+                                        {% endif %}
+                                        <button class="btn btn-sm btn-warning btn-edit" title="Modifier la valeur"><i class="fa fa-edit"></i></button>
+                                        <button class="btn btn-sm btn-danger btn-delete" title="Supprimer la valeur"><i class="fa fa-times"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {# template ligne affichage domaine #}
+    <table id="template-affichage-domaine" class="d-none">
+        <tbody>
+            <tr data-id="">
+                <td class="text-center"></td>
+                <td class="text-right">
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-info btn-add" title="Ajouter un sous-domaine"><i class="fa fa-plus"></i></button>
+                        <button class="btn btn-sm btn-warning btn-edit" title="Modifier la valeur"><i class="fa fa-edit"></i></button>
+                        <button class="btn btn-sm btn-danger btn-delete" title="Supprimer la valeur"><i class="fa fa-times"></i></button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    {# template ligne affichage sous-domaine #}
+    <table id="template-affichage-sous-domaine" class="d-none">
+        <tbody>
+            <tr data-id="" data-parent="">
+                <td class="text-center text-info"><small></small></td>
+                <td class="text-right">
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-warning btn-edit" title="Modifier la valeur"><i class="fa fa-edit"></i></button>
+                        <button class="btn btn-sm btn-danger btn-delete" title="Supprimer la valeur"><i class="fa fa-times"></i></button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    {# template ligne saisie (sous-)domaine #}
+    <table id="template-saisie-domaine" class="d-none">
+        <tbody>
+            <tr class="item-editing">
+                <td>
+                    {{ form_widget(form.label) }}
+                </td>
+                <td class="text-right">
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-danger btn-cancel" title="Annuler"><i class="fa fa-times"></i></button>
+                        <button class="btn btn-sm btn-success btn-apply" title="Appliquer"><i class="fa fa-check"></i></button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    {# Modal confirmation d'annulation des modifications / ajout #}
+    <div class="modal fade" id="confirmationAnnulationModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p>Souhaitez-vous annuler cette opération ?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Non</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Oui</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Modal confirmation de suppression d'une valeur #}
+    <div class="modal fade" id="confirmationSuppressionModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p id="confirmationSuppressionModal-message"></p>
+                    <p>Souhaitez-vous continuer ?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Non</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Oui</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Modal d'affichage des erreurs serveurs #}
+    <div class="modal fade" id="erreurServeurModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ parent() }}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('assets/js/gestion/references/domaines.js') }}" type="text/javascript"></script>
+{% endblock %}

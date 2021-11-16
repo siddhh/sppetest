@@ -1,0 +1,11 @@
+{% extends 'base.pleine.html.twig' %}
+
+{% block title %}Gestion | {{ parent() }}{% endblock %}
+
+{% block contenu %}
+
+    <div class="m-5 text-center">
+        <a class="btn btn-sm btn-secondary" href="{{ path('afficher-gestion-accueil') }}">Retour à l'administration</a>
+    </div>
+
+{% endblock %}

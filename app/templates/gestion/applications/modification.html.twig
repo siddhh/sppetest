@@ -1,0 +1,22 @@
+{% extends 'gestion/applications/_form.html.twig' %}
+
+{% block title %}Modification d'une application | {{ parent() }}{% endblock %}
+
+{% block titre_contenu %}Modification de l'application {{ form.label.vars.value }}{% endblock %}
+
+{% block domaine %}
+     {% for domaine in domaines %}
+        <option data-id={{ domaine['id'] }} {% if domaine['id'] == form.vars.value.sousDomaine.domaineParent.id %} selected="selected"{% endif %}>
+            {{ domaine['label'] }}
+        </option>
+    {% endfor %}
+{% endblock %}
+
+{% block bouton %}
+    <a id="suppression" data-id="{{ form.vars.value.id }}" class="btn btn-danger" href="/gestion/application/{{ form.vars.value.id }}/suppression">Supprimer</a>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('assets/js/gestion/applications/modification.js') }}"></script>
+{% endblock %}

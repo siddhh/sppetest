@@ -1,0 +1,32 @@
+#liste-domaines {
+
+    .btn-sppe {
+        background-color: #99C4BF;
+        padding-left: 3em;
+        padding-right: 3em;
+    }
+
+    table thead {
+        background-color: #B7B7B7;
+    }
+
+    #modele-creation-domaine input {
+        border: solid 3px DarkTurquoise;
+    }
+
+    .item-loading, .item-transparency {
+        opacity: 0.5;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      .item-loading {
+        cursor: wait;
+
+        * {
+            cursor: wait!important;
+          }
+      }
+}

@@ -1,0 +1,103 @@
+{% extends 'base.pleine.html.twig' %}
+{% block title %}Création d'une application | {{ parent() }}{% endblock %}
+
+{% block contenu %}
+
+    <h2 class="page-title">{% block titre_contenu %}Création d'une application{% endblock %}</h2>
+
+    <div class="form" id="formulaire">
+
+        {{ form_start(form) }}
+
+        <div class="form-group">
+            {{ form_label(form.label, 'Libellé*', {'label_attr': {'class': 'col-form-label' ~ (form.label.vars.valid ? '' : 'form-label-error') }}) }}
+            <div>
+                {{ form_widget(form.label, {
+                    'attr': {
+                        'class': 'form-control' ~ (form.label.vars.valid ? '' : ' form-control-error'),
+                    }
+                }) }}
+                <div class="form-errors">
+                    {{ form_errors(form.label) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-form-label">
+                Domaine*
+            </div>
+            <div>
+                <select class="form-control" id="domaine" required="required">
+                    {% block domaine %}
+                        <option selected="selected"></option>
+                        {% for domaine in domaines %}
+                            <option data-id={{ domaine['id'] }}>
+                                {{ domaine['label'] }}
+                            </option>
+                        {% endfor %}
+                    {% endblock %}
+                </select>
+                <div class="form-errors">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.sousDomaine, 'Sous-domaine*', {'label_attr': {'class': 'col-form-label ' ~ (form.sousDomaine.vars.valid ? '' : 'form-label-error') }}) }}
+            <div>
+                {{ form_widget(form.sousDomaine, {
+                    'attr': {
+                        'class': 'form-control ' ~ (form.sousDomaine.vars.valid ? '' : 'form-control-error'),
+                    }
+                }) }}
+                <div class="form-errors">
+                    {{ form_errors(form.sousDomaine) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.exploitant, 'Exploitant*', {'label_attr': {'class': 'col-form-label ' ~ (form.exploitant.vars.valid ? '' : 'form-label-error') }}) }}
+            <div>
+                {{ form_widget(form.exploitant, {
+                    'attr': {
+                        'class': 'form-control ' ~ (form.exploitant.vars.valid ? '' : 'form-control-error'),
+                    }
+                }) }}
+                <div class="form-errors">
+                    {{ form_errors(form.exploitant) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.MOE, 'MOE', {'label_attr': {'class': 'col-form-label' ~ (form.MOE.vars.valid ? '' : 'form-label-error') }}) }}
+            <div>
+                {{ form_widget(form.MOE, {
+                    'attr': {
+                        'class': 'form-control ' ~ (form.MOE.vars.valid ? '' : 'form-control-error'),
+                    }
+                }) }}
+                <div class="form-errors">
+                    {{ form_errors(form.MOE) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="barre-boutons-bas">
+            <a type="button" class="btn btn-secondary" href="{{ path('afficher-gestion-application-liste') }}">Annuler</a>
+            {% block bouton %}
+            {% endblock %}
+            <button id="validation" type="submit" class="btn btn-primary">Enregistrer</button>
+        </div>
+
+        {{ form_end(form) }}
+
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

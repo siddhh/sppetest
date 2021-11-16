@@ -1,0 +1,13 @@
+.container-authentification {
+    width: 650px;
+    margin: auto;
+}
+
+input.borderless {
+    border: none;
+    border-bottom: dashed 1px #666;
+    border-radius: 0;
+    &:focus {
+        outline: none;
+    }
+}

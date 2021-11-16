@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    <div class="big-loading"{% if big_loading_display is defined and big_loading_display %} style="display:block;"{% endif %}></div>
+
+    <header>
+        <div class="container">
+            <div class="row mb-3">
+                <div class="col-2">
+                    <a href="/"><img src="{{ asset('assets/img/logo.svg') }}" alt="SPPE" width="120"></a>
+                </div>
+                <div class="col-5 mt-3">Suivi du Plan de Production des Exploitations</div>
+                {% if app.user %}
+                    <div class="col-1 text-right"></div>
+                    <div class="col-3 mt-3 text-right">
+                        {{ app.user == "invite" ? "Invité" : app.user.login }}
+                    </div>
+                    <div class="col-1 mt-3">
+                        {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                            <a href="{{ path('app-connexion', {'_switch_user': '_exit'}) }}" title="déconnexion"><img class="float-right" src="{{ asset('assets/img/boutonDeconnecter.png') }}" alt="déconnexion"></a>
+                        {% else %}
+                            <a href="{{ path('app-deconnexion') }}" title="Déconnexion"><img class="float-right" src="{{ asset('assets/img/boutonDeconnecter.png') }}" alt="déconnexion"></a>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="col-4"></div>
+                    <div class="col-1 mt-3">
+                        <a href="{{ path('app-connexion') }}" title="Se connecter"><img class="float-right" src="{{ asset('assets/img/boutonDeconnecter.png') }}" alt="connection"></a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        {% block contenu %}{% endblock %}
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}

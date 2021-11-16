@@ -1,0 +1,11 @@
+twig:
+    default_path: '%kernel.project_dir%/templates'
+    globals:
+        build:
+            version: '%env(default::BUILD_VERSION)%'
+            date: '%env(default::BUILD_DATE)%'
+        base_url: '%env(default::BASE_URL)%'
+        message_service: '%env(default::MESSAGE_SERVICE)%'
+when@test:
+    twig:
+        strict_variables: true

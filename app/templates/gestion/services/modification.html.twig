@@ -1,0 +1,30 @@
+{% extends 'gestion/services/_form.html.twig' %}
+
+{% block title %}Modification du service "{{ service.label }}" | {{ parent() }}{% endblock %}
+
+{% block titre_contenu %}Modification du service "{{ service.label }}"{% endblock %}
+
+{% block contenu %}
+    {{ parent() }}
+    <!-- modal suppression service -->
+    <div class="modal fade" id="ServiceSupprimeModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p>Ce service sera définitivement supprimé.</p>
+                    <p>Voulez-vous confirmer ?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Non</button>
+                    <button type="button" class="btn btn-primary suppression-service">Oui</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- fin modal-->
+{% endblock %}
+
+{% block boutons %}
+    <button id="btSupprimerService" type="button" class="btn btn-danger" data-service-id="{{ service.id }}" data-toggle="modal" data-target="#ServiceSupprimeModal">Supprimer le service</button>
+    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+{% endblock %}

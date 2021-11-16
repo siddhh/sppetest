@@ -1,0 +1,87 @@
+security:
+
+    # Activation du nouveau système d'authentification proposé depuis Symfony 5.1
+    # https://symfony.com/doc/current/security/authenticator_manager.html
+    enable_authenticator_manager: true
+
+    # Défini l'algoritme utilisé par les classes d'utilisateur pour hasher les mots de passe 
+    # https://symfony.com/doc/current/security.html#c-hashing-passwords
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        App\Entity\User:
+            algorithm: auto
+
+    # Liste les différents système permettant de récupérer un objet utilisateur (notamment lors du refresh)
+    # used to reload user from session & other features (e.g. switch_user)
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    providers:
+        # Propose un fournisseur qui tentera de récupérer un utilisateur à partir de plusieurs fournisseurs (il essayera tous les fournisseurs dans l'ordre jusqu'à ce qu'un retourne l'utilisateur demandé)
+        chain_provider:
+            chain:
+                providers: [ in_memory, in_db ]
+        # Récupére un objet utilisateur à partir d'une liste predéfinie (ici on l'utilise pour définir l'utilisateur invité qui n'existe pas en base de données)
+        in_memory:
+            memory:
+                users:
+                    invite: { roles: ['ROLE_INVITE'] }
+        # Récupére un objet utilisateur à partir de l'ORM; ici l'entité User
+        #   (le paramètre 'property' n'est pas défini, donc le provider utilise la méthode UserRepository->loadUserByIdentifier() pour récupérer un utilisateur).
+        in_db:
+            entity:
+                class: App\Entity\User
+
+    # Liste les différents systèmes de sécurité existants pour l'application
+    firewalls:
+
+        # Firewall utilisé pour désactiver le système de sécurité associé aux ressources utilisées par le profiler en développement
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/     # pattern utilisé pour sélectionner ce firewall
+            security: false                                 # la sécurité est désactivée pour ce firewall
+
+        # Firewall permettant de gérer la sécurité sur l'application SPPE (mis à part le profiler utilisé lors des développements)
+        main:
+            lazy: true                                    
+            provider: chain_provider                                    # Fournisseur d'utilisateur utilisé par ce firewall (système permettant de récupérer un utilisateur)
+            custom_authenticator: App\Security\LoginFormAuthenticator   # La classe responsable de l'authentification (c'est elle qui défini si, à partir d'informations de connexion, par exemple un formulaire d'authentification, un utilisateur peut de se connecter.)
+
+            # Gestion des déconnexions
+            logout:
+                path: app-deconnexion       # Route servant à la déconnexion des utilisateurs
+                target: app-connexion       # Route où est redirigée l'utilisateur en cas de déconnexion (le formulaire de connexion)
+
+            # Fonctionnalité "remember me": cookie permettant de faire perdurer plus longtemps la connexion que le permet le cookie de session
+            #remember_me:
+            #    secret:   '%kernel.secret%' # clef permettant de chiffrer les données
+            #    lifetime: 604800            # Durée du cookie
+            #    path:     /                 # Chemin du cookie
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#firewalls-authentication
+
+            # Autorise les utilisateurs ayant le rôle ROLE_USURPATEUR à se connecter en tant qu'un autre utilisateur.
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            switch_user: { role: ROLE_USURPATEUR }
+
+    # Défini une hierchie entre les rôles
+    # ROLE_USER: regroupe tous les utilisateurs de SPPE (y compris l'invité)
+    # ROLE_SERVICE: regroupe tous les utilisateurs (sauf l'utilisateur invité)
+    # ROLE_USURPATEUR: seuls les utilisateurs ayant ce rôle peuvent usurper l'identité d'autres utilisateurs (se connecter en tant que)
+    # Les autres rôles sont décrits dans les spécifications.
+    role_hierarchy:
+        ROLE_ADMIN:     ROLE_USER, ROLE_SERVICE, ROLE_USURPATEUR
+        ROLE_ESI:       ROLE_USER, ROLE_SERVICE
+        ROLE_BE:        ROLE_USER, ROLE_SERVICE
+        ROLE_STANDARD:  ROLE_USER, ROLE_SERVICE
+        ROLE_CQMF:      ROLE_USER, ROLE_SERVICE
+        ROLE_SI2C:      ROLE_USER, ROLE_SERVICE
+        ROLE_INVITE:    ROLE_USER
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    # Impose des restrictions d'accès sur les ressources à partir du chemin demandé (la premiere correspondances trouvée sera utilisée)
+    access_control:
+        - { path: ^/connexion$,     roles: [ IS_AUTHENTICATED_ANONYMOUSLY ] }
+        - { path: ^/deconnexion$,   roles: [ ROLE_USER ] }
+        - { path: ^/gestion,        roles: [ ROLE_ADMIN ] }
+        - { path: ^/ajax/gestion,   roles: [ ROLE_ADMIN ] }
+        - { path: ^/,               roles: [ ROLE_USER ] }

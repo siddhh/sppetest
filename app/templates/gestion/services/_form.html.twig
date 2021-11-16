@@ -1,0 +1,212 @@
+{% extends 'base.pleine.html.twig' %}
+
+{% block title %}Gestion des services | {{ parent() }}{% endblock %}
+
+{% block contenu %}
+
+    <h2 class="page-title">{% block titre_contenu %}Création d'un service{% endblock %}</h2>
+
+    <div class="form">
+
+        {{ form_start(form) }}
+
+            <div class="form-group" id="label">
+                {{ form_label(form.label, 'Libellé*', {'label_attr': {'class': 'col-form-label ' ~ (form.label.vars.valid ? '' : 'form-label-error') }}) }}
+                <div>
+                    {{ form_widget(form.label, {'attr': {'class': 'form-control ' ~ (form.label.vars.valid ? '' : 'form-control-error')}}) }}
+                    <div class="form-errors">
+                        {{ form_errors(form.label) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" id="profil">
+                {{ form_label(form.profil, 'Profil*', {'label_attr': {'class': 'col-form-label ' ~ (form.profil.vars.valid ? '' : 'form-label-error') }}) }}
+                <div>
+                    {{ form_widget(form.profil, {'attr': {'class': 'form-control ' ~ (form.profil.vars.valid ? '' : 'form-control-error')}}) }}
+                    <div class="form-errors">
+                        {{ form_errors(form.profil) }}
+                    </div>
+                </div>
+            </div>
+
+            {# TODO:Rajouter form-ldap dans la class pour rendre la recherche du champ dans le LDAP active #}
+            <div class="form-group">
+                {{ form_label(form.balf, 'BALF*', {'label_attr': {'class': 'col-form-label ' ~ (form.balf.vars.valid ? '' : 'form-label-error') }}) }}
+                <div>
+                    <div class="position-relative">
+                        {{ form_widget(form.balf, {'attr': {'class': 'form-control ' ~ (form.balf.vars.valid ? '' : 'form-control-error') }}) }}
+                        <span class="fa fa-fw fa-times field-icon reset-field d-none"></span>
+                        <span class="fa fa-fw fa-spinner field-icon d-none"></span>
+                    </div>
+                    <div class="form-ldap-resultats">
+                    </div>
+                    <div class="form-errors">
+                        {{ form_errors(form.balf) }}
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: none;">
+                {{ form_label(form.perimetreApplicatif, 'Application', {'label_attr': {'class': 'col-form-perimetreApplicatif ' ~ (form.perimetreApplicatif.vars.valid ? '' : 'form-perimetreApplicatif-error') }}) }}
+                <div>
+                    {{ form_widget(form.perimetreApplicatif, {'attr': {'class': 'form-control ' ~ (form.perimetreApplicatif.vars.valid ? '' : 'form-control-error')}}) }}
+                    <div class="form-errors">
+                        {{ form_errors(form.perimetreApplicatif) }}
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: none;">
+                {{ form_label(form.users, 'Utilisateurs', {'label_attr': {'class': 'col-form-users ' ~ (form.users.vars.valid ? '' : 'form-users-error') }}) }}
+                <div>
+                    {{ form_widget(form.users, {'attr': {'class': 'form-control ' ~ (form.users.vars.valid ? '' : 'form-control-error')}}) }}
+                    <div class="form-errors">
+                        {{ form_errors(form.users) }}
+                    </div>
+                </div>
+            </div>
+
+            {# Boutons #}
+            <div class="form-group">
+                <div></div>
+                <div class="barre-boutons-gros">
+                    <button id="majServiceApplications" class="btn btn-primary" type="button">Périmètre applicatif</button>
+                    <button id="majServiceUsers" class="btn btn-primary" type="button">Utilisateurs</button>
+                </div>
+            </div>
+            
+            <div class="barre-boutons-bas">
+                <a href="{{ path('afficher-gestion-service-liste') }}" type="button" class="btn btn-secondary">Annuler</a>
+                {% block boutons %}
+                    <button type="submit" class="btn btn-primary">Enregistrer le service</button>
+                {% endblock %}
+            </div>
+
+            {# Modal application des modifications #}
+            <div class="modal fade" id="serviceApplicationsModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5></h5>
+                            <button type="button" class="annulationPerimetreApplicatif close" data-dismiss="modal" aria-label="Fermer">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div id="applications" class="m-2 mb-3">
+                                <label for="selectionApplication" class="mr-2">Application</label>
+                                <select id="selectionApplication" name="applicationId" class="form-control select-picker d-inline-block w-50">
+                                    <option value=""></option>
+                                    {% for application in listeApplications %}
+                                        <option value="{{ application.id }}"> {{ application.label }} </option>
+                                    {% endfor %}
+                                </select>
+                                <button type="button" class="btn btn-primary" id="btn-ajouter-application">Ajouter</button>
+                                <button type="button" class="btn btn-danger" id="btn-retirer-application">Retirer</button>
+                            </div>
+                            <table class="table checkall-container">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th scope="col">Application</th>
+                                        <th scope="col">Domaine</th>
+                                        <th scope="col">Sous-domaine</th>
+                                        <th scope="col">Exploitant</th>
+                                        <th scope="col">Bureau MOE</th>
+                                        <th scope="col"><input type="checkbox" value="1" class="checkall"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="liste-resultats-applications">
+                                    {% for application in listeApplications %}
+                                        <tr data-service-id="{{ service.id|default('') }}" data-application-id="{{ application.id|default('') }}" class="checkall-box-handle">
+                                            <td>{{ application.label|default('') }}</td>
+                                            <td>{{ application.sousDomaine.domaineParent.label|default('') }}</td>
+                                            <td>{{ application.sousDomaine.label|default('') }}</td>
+                                            <td>{{ application.exploitant.label|default('') }}</td>
+                                            <td>{{ application.moe.label|default('') }}</td>
+                                            <td><input name="applications[]" type="checkbox" class="checkall-box" value="{{ application.id }}" /></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                            {# Boutons modal #}
+                            <div class="barre-boutons-bas">
+                                <button type="button" class="annulationPerimetreApplicatif btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                <button type="button" class="btn btn-primary validation" data-dismiss="modal">Valider</button>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            {# Modal user des modifications #}
+            <div class="modal fade" id="serviceUsersModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-xl" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5></h5>
+                            <button type="button" class="annulationUser close" data-dismiss="modal" aria-label="Fermer">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+
+                        <div class="modal-body">
+                            <div id="users" class="m-2 mb-3">
+                                <label for="selectionUser" class="mr-2">Utilisateur</label>
+                                <select id="selectionUser" name="userId" class="form-control select-picker d-inline-block w-50">
+                                    <option value=""></option>
+                                    {% for user in listeUsers %}
+                                        <option value="{{ user.id }}"> {{ user.nom }} {{ user.prenom }} &lt;{{ user.balp}}&gt; </option>
+                                    {% endfor %}
+                                </select>
+                                <button type="button" class="btn btn-primary" id="btn-ajouter-user">Ajouter</button>
+                                <button type="button" class="btn btn-danger" id="btn-retirer-user">Retirer</button>
+                            </div>
+                        
+                            <table class="table checkall-container">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th scope="col">Nom</th>
+                                        <th scope="col">Prenom</th>
+                                        <th scope="col">BALP</th>
+                                        <th scope="col"><input type="checkbox" class="checkall"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="liste-resultats-users">
+                                    {% for user in listeUsers %}
+                                        <tr data-service-id="{{ service.id|default('') }}" data-user-id="{{ user.id|default('') }}" class="checkall-box-handle">
+                                            <td>{{ user.nom|default('') }}</td>
+                                            <td>{{ user.prenom|default('') }}</td>
+                                            <td>{{ user.balp|default('') }}</td>
+                                            <td><input name="users[]" type="checkbox" class="checkall-box" value="{{ user.id }}" /></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+
+                            <!-- Boutons modal -->
+                            <div class="barre-boutons-bas">
+                                <button type="button" class="annulationUser btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                <button type="button" class="btn btn-primary validation" data-dismiss="modal">Valider</button>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            {# Fin des Modals #}
+
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('assets/js/form.js') }}"></script>
+    <script src="{{ asset('assets/js/gestion/services/majService.js') }}"></script>
+{% endblock %}
+

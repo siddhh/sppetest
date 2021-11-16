@@ -1,0 +1,3 @@
+reference.label.unique: Ce libellé est déjà utilisé, vous devriez en choisir un autre.
+reference.label.min: Le libellé est trop court (minimum {{ limit }} caractères).
+reference.label.max: Le libellé est trop long (maximum {{ limit }} caractères).

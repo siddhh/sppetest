@@ -1,0 +1,17 @@
+{% extends 'base.pleine.html.twig' %}
+
+{% block title %}Gestion | {{ parent() }}{% endblock %}
+
+{% block contenu %}
+
+    <h2 class="page-title">Gestion</h2>
+
+    <nav class="d-flex justify-content-center flex-wrap row text-center">
+        <a class="btn btn-primary m-2 p-3 col-3" href="{{ path('afficher-gestion-utilisateur-liste') }}">Utilisateurs</a>
+        <a class="btn btn-primary m-2 p-3 col-3" href="{{ path('afficher-gestion-service-liste') }}">Services</a>
+        <a class="btn btn-primary m-2 p-3 col-3" href="{{ path('afficher-gestion-application-liste') }}" class="btn btn-primary">Applications</a>
+        <a class="btn btn-primary m-2 p-3 col-3" href="#">Plans de productions</a>
+        <a class="btn btn-primary m-2 p-3 col-3" href="{{ path('afficher-gestion-reference-domaines') }}">Domaines</a>
+    </nav>
+
+{% endblock %}
